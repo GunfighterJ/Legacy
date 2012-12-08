@@ -59,8 +59,37 @@ public class LegacyCommand implements CommandExecutor {
 
 				// display to player
 				player.sendMessage(ChatColor.GREEN + "Time played: " + ChatColor.GOLD + timePlayed(totalTime));
+                                if(totalTime > 144000 && this.plugin.isBPP(player)){
+                                    player.sendMessage(ChatColor.YELLOW + "You have over 40 hours of gameplay!");
+                                    player.sendMessage(ChatColor.AQUA + "Type /legacy promote");
+                                    player.sendMessage(ChatColor.AQUA + "To be promoted to mobster.");
+                                }
 				return true;
 			}
+                        
+                        if (args.length == 1 && args[0].equals("promote")){
+                          if(isPlayer && Legacy.checkPermission("legacy.check", player)){
+                              long time = 0;
+                              
+                              for (Map.Entry<Player,Long> entry : Legacy.timeTracker.entrySet()){
+					if (entry.getKey().equals(player)){
+						time += (now.getTime() - entry.getValue()) / 1000;
+                                        }
+                              }
+				// search prior sessions
+				if (Legacy.logConfig.contains(player.getName())){
+					time += Legacy.logConfig.getLong(player.getName());
+                                }
+                                
+                                if(time >= 144000 && this.plugin.isBPP(player)){
+                                    this.plugin.setMobster(player);
+                                } else {
+                                    player.sendMessage(ChatColor.RED + "Sorry, you don't have enough time or you aren't a Builder++ :(");
+                                }
+                              
+                          }
+                            return true;
+                        }
 
 			// <command> [top]
 			if (args.length == 1 && args[0].equals("top")) {

@@ -3,6 +3,7 @@ main: co.viocode.legacy.Legacy
 name: Legacy
 url: http://viocode.co/
 version: 1.3.0
+depend: [Vault]
 commands:
   legacy:
     description: Displays server play time.

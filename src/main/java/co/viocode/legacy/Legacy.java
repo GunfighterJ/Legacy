@@ -13,6 +13,8 @@ import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
+import net.milkbowl.vault.permission.Permission;
+import org.bukkit.plugin.RegisteredServiceProvider;
 
 public class Legacy extends JavaPlugin implements Listener {
 
@@ -26,6 +28,8 @@ public class Legacy extends JavaPlugin implements Listener {
 	static File pluginConfigFile = null;
 	public static FileConfiguration logConfig = null;
 	static File logConfigFile = null;
+        
+        public static Permission perms = null;
 
 	@Override
 	public void onDisable() {
@@ -67,6 +71,8 @@ public class Legacy extends JavaPlugin implements Listener {
 		savePluginConfig();
 		loadLogConfig();
 		saveLogConfig();
+                
+                setupPermissions();
 
 		// register commands
 		getCommand("legacy").setExecutor(new LegacyCommand(this));
@@ -231,4 +237,23 @@ public class Legacy extends JavaPlugin implements Listener {
 		// add player to timeTracker
 		timeTracker.put(player, new Date().getTime());
 	}
+        
+        private boolean setupPermissions() {
+        RegisteredServiceProvider<Permission> rsp = getServer().getServicesManager().getRegistration(Permission.class);
+        perms = rsp.getProvider();
+        return perms != null;
+        }
+        
+        public boolean isBPP(Player player){
+            if(perms.getPrimaryGroup(player) == "Builder++"){
+                return true;
+            } else {
+                return false;
+            }
+        }
+        
+        public void setMobster(Player player){
+            perms.playerRemoveGroup(player, "Builder++");
+            perms.playerAddGroup(player, "Mobster");
+        }
 }
